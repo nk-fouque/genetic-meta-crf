@@ -36,7 +36,7 @@ def generate_template(individual: List[Rule], id: str):
     f.close()
 
 
-def evaluate_individual(individual: List[Rule], id: str):
+def fitness_individual(individual: List[Rule], id: str):
     generate_template(individual,str(id))
     try:
         subprocess.check_call(WAPITI_LOCATION+' train -p '+TEMPLATE_FILE+id+' -t 8 '+DATASET+' '+MODEL_FILE+id, shell = True)
