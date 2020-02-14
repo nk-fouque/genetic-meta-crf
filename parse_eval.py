@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import subprocess
+from genetic import *
 #https://stackoverflow.com/questions/13332268/how-to-use-subprocess-command-with-pipes
 
 #Currently the model file must already exist
@@ -13,36 +14,62 @@ TEMPLATE_FILE = "template"
 DATASET = "atis.train"
 MODEL_FILE = "modele"
 LABEL_FILE = "labels"
-EVAL_FILE = "eval"
+EVAL_FILE = "reseval"
 
-try:
-    subprocess.check_call(WAPITI_LOCATION+' train -p '+TEMPLATE_FILE+' -t 8 '+DATASET+' '+MODEL_FILE, shell = True)
-except subprocess.CalledProcessError as e:
-    print(e.returncode)
-    print(e.cmd)
-    print(e.output)
+Evaluation = namedtuple("Evaluation", "accuracy precision recall f1")
 
-try:
-    subprocess.check_call(WAPITI_LOCATION+' label -m '+MODEL_FILE+' <'+DATASET+' > '+LABEL_FILE, shell = True)
-except subprocess.CalledProcessError as e:
-    print(e.returncode)
-    print(e.cmd)
-    print(e.output)
+def write_rule(rule :Rule, name: str):
+    arity = getattr(rule,'arity')
+    param1 = getattr(rule,'param1')
+    param2 = getattr(rule,'param2')
+    param3 = getattr(rule,'param3')
+    param4 = getattr(rule,'param4')
+    res = arity+name+'%x['+str(param1)+','+str(param2)+']'
+    if param3 is not None:
+        res+='/%x['+str(param3)+','+str(param4)+']'
+    return res
 
-try:
-    subprocess.check_call('cat '+LABEL_FILE+' | perl evaluation.pl > '+EVAL_FILE, shell = True)
-except subprocess.CalledProcessError as e:
-    print(e.returncode)
-    print(e.cmd)
-    print(e.output)
+def generate_template(individual: List[Rule], id: str):
+    f = open(TEMPLATE_FILE+id, "w+")
+    for i,rule in enumerate(individual):
+        f.write(write_rule(rule,str(i))+"\n")
+    f.close()
 
-with open(EVAL_FILE, "r") as f:
-    for i, line in enumerate(f):
-        if(i==1):
-            l = line.split()
-            accuracy=l[1]
-            precision=l[3]
-            recall=l[5]
-            f1=l[7]
-            break
-print("Score : Accuracy="+accuracy+"; Precision="+precision+"; Recall="+recall+"; F-measure="+f1)
+
+def evaluate_individual(individual: List[Rule], id: str):
+    generate_template(individual,str(id))
+    try:
+        subprocess.check_call(WAPITI_LOCATION+' train -p '+TEMPLATE_FILE+id+' -t 8 '+DATASET+' '+MODEL_FILE+id, shell = True)
+    except subprocess.CalledProcessError as e:
+        print(e.returncode)
+        print(e.cmd)
+        print(e.output)
+
+    try:
+        subprocess.check_call(WAPITI_LOCATION+' label -m '+MODEL_FILE+id+' <'+DATASET+' > '+LABEL_FILE+id, shell = True)
+    except subprocess.CalledProcessError as e:
+        print(e.returncode)
+        print(e.cmd)
+        print(e.output)
+
+    try:
+        subprocess.check_call('cat '+LABEL_FILE+id+' | perl evaluation.pl > '+EVAL_FILE+id, shell = True)
+    except subprocess.CalledProcessError as e:
+        print(e.returncode)
+        print(e.cmd)
+        print(e.output)
+
+    with open(EVAL_FILE, "r") as f:
+        for i, line in enumerate(f):
+            if(i==1):
+                l = line.split()
+                accuracy=l[1]
+                precision=l[3]
+                recall=l[5]
+                f1=l[7]
+                break
+    return Evaluation(accuracy, precision, recall, f1)
+
+if __name__ == '__main__':
+    ind = create_individual()
+    print(evaluate_individual(ind,'0'))
