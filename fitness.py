@@ -59,7 +59,7 @@ def fitness_individual(individual: List[Rule], id: str):
         print(e.cmd)
         print(e.output)
 
-    with open(EVAL_FILE, "r") as f:
+    with open(EVAL_FILE+str(id), "r") as f:
         for i, line in enumerate(f):
             if(i==1):
                 l = line.split()
@@ -72,4 +72,4 @@ def fitness_individual(individual: List[Rule], id: str):
 
 if __name__ == '__main__':
     ind = create_individual()
-    print(evaluate_individual(ind,'0'))
+    print(fitness_individual(ind,'0'))
