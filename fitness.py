@@ -10,11 +10,11 @@ from genetic import *
 
 
 WAPITI_LOCATION = "wapiti-1.5.0/wapiti"
-TEMPLATE_FILE = "template"
+TEMPLATE_FILE = "generated_files/template"
 DATASET = "atis.train"
-MODEL_FILE = "modele"
-LABEL_FILE = "labels"
-EVAL_FILE = "reseval"
+MODEL_FILE = "generated_files/modele"
+LABEL_FILE = "generated_files/labels"
+EVAL_FILE = "generated_files/reseval"
 
 Evaluation = namedtuple("Evaluation", "accuracy precision recall f1")
 
