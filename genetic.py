@@ -1,6 +1,7 @@
 import random
 from collections import namedtuple
 from typing import Tuple, List
+import save
 
 POPULATION_SIZE = 20
 RANDOM_RULE_CHANCE = 10
@@ -72,7 +73,6 @@ def initialize_population() -> List[List[Rule]]:
 
 if __name__ == '__main__':
     pop = initialize_population()
-    print(pop)
 
     crossed_pop = []
     while len(crossed_pop) < POPULATION_SIZE:
@@ -82,4 +82,7 @@ if __name__ == '__main__':
             crossed_pop.append(a)
             crossed_pop.append(b)
     print(crossed_pop)
-    print(len(crossed_pop))
+
+    save.export_population("export", crossed_pop)
+    loaded_pop = save.load_population("export")
+    print(loaded_pop)
