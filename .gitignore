@@ -1,2 +1,4 @@
 venv
 generated_files/*
+saves/*
+.idea/vcs.xml
