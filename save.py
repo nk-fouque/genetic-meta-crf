@@ -1,6 +1,8 @@
 import json
+from collections import namedtuple
+from typing import List
 
-from genetic import *
+Rule = namedtuple("Rule", "arity param1 param2 param3 param4")
 
 
 def export_population(file: str, population: List[List[Rule]]):

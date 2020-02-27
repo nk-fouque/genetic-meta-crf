@@ -56,7 +56,7 @@ def cross_individuals(i1: list, i2: list) -> Tuple[List, List]:
 
 
 def create_rule() -> Rule:
-    arity = 'U' if random.randint(0, 5) < 3 else 'B' if random.randint(0,5) < 3 else '*'
+    arity = 'U' if random.randint(0, 5) < 4 else 'B' if random.randint(0,5) < 4 else '*'
     param1 = random.randint(-2, 2)
     param2 = 0
     return Rule(arity, param1, param2, None, None)
