@@ -1,25 +1,23 @@
 #!/usr/bin/python3
+import sys
 import subprocess
 
 from genetic import *
 
 # https://stackoverflow.com/questions/13332268/how-to-use-subprocess-command-with-pipes
 
-# Currently the model file must already exist
-# TODO generate model file from individual
-
-
 WAPITI_LOCATION = "wapiti-1.5.0/wapiti"
 TEMPLATE_FILE = "generated_files/template"
 DATASET = "atis.train"
 MODEL_FILE = "generated_files/modele"
+EXTERNAL_KNOWLEDGE = "modele_boost"
 LABEL_FILE = "generated_files/labels"
 EVAL_FILE = "generated_files/reseval"
 
 Evaluation = namedtuple("Evaluation", "accuracy precision recall f1")
 
 
-def write_rule(rule: Rule, name: str):
+def write_rule(rule: Rule, name: str) -> str:
     arity = getattr(rule, 'arity')
     param1 = getattr(rule, 'param1')
     param2 = getattr(rule, 'param2')
@@ -30,13 +28,14 @@ def write_rule(rule: Rule, name: str):
         res += '/%x[' + str(param3) + ',' + str(param4) + ']'
     return res
 
-
-def generate_template(individual: List[Rule], id: str):
-    f = open(TEMPLATE_FILE + id, "w+")
-    for i, rule in enumerate(individual):
-        f.write(write_rule(rule, str(i)) + "\n")
-    f.close()
-
+def generate_template(individual: List[Rule], id: str) -> None:
+    with open(TEMPLATE_FILE+id, "w+") as f:
+        for i,rule in enumerate(individual):
+            f.write(write_rule(rule,str(i))+"\n")
+        f.write("# External Knowledge")
+        with open(EXTERNAL_KNOWLEDGE,'r') as f2:
+            for line in f2:
+                f.write(line)
 
 def fitness_population(population: List[List[Rule]]) -> List(Evaluation):
     return [fitness_individual(individual, str(id)) for id, individual in enumerate(population)]

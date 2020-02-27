@@ -1,0 +1,7 @@
+Ureg1%m[0,0,"\d*"]
+Ureg2%t[0,0,"^to$"]
+Ureg3%t[0,0,"^from$"]
+Ureg4%t[0,0,"flight-times"]
+Ureg5%m[0,0,"\p*"]
+Ureg5%t[0,0,"airline"]
+
