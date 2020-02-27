@@ -3,6 +3,8 @@ import subprocess
 
 from genetic import *
 
+Rule = namedtuple("Rule", "arity param1 param2 param3 param4")
+
 # https://stackoverflow.com/questions/13332268/how-to-use-subprocess-command-with-pipes
 
 # Currently the model file must already exist
@@ -38,7 +40,7 @@ def generate_template(individual: List[Rule], id: str):
     f.close()
 
 
-def fitness_population(population: List[List[Rule]]) -> List(Evaluation):
+def fitness_population(population: List[List[Rule]]) -> List[Evaluation]:
     return [fitness_individual(individual, str(id)) for id, individual in enumerate(population)]
 
 

@@ -2,6 +2,8 @@ import json
 
 from genetic import *
 
+Rule = namedtuple("Rule", "arity param1 param2 param3 param4")
+
 
 def export_population(file: str, population: List[List[Rule]]):
     with open(file, "w") as f:

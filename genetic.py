@@ -2,10 +2,11 @@ import random
 from collections import namedtuple
 from typing import Tuple, List
 
+import os
 import fitness
 import save
 
-POPULATION_SIZE = 20
+POPULATION_SIZE = 4
 RANDOM_RULE_CHANCE = 10
 MUTATE_ARITY_CHANCE = 30
 MUTATE_PARAM_CHANCE = 50
@@ -87,28 +88,24 @@ def cross_population(population: List[List[Rule]]) -> List[List[Rule]]:
 
 def run_one_generation(population: List[List[Rule]]) -> List[List[Rule]]:
     evaluation = fitness.fitness_population(population)  # Evaluate pop
-    scored_population = list(zip(evaluation, population))
+    scored_population = list(zip(range(4), population))
     scored_population.sort(key=lambda x: x[0], reverse=True)
     new_population = cross_population(  # Create new pop
-        [scored_individual[1] for scored_individual in scored_population[len(scored_population) // 2]])
+        [scored_individual[1] for scored_individual in scored_population[::len(scored_population) // 2]])
     for individual in new_population:  # Mutate new pop
         mutate(individual)
     del population  # Delete old population
     return new_population  # return the new population
 
 
+def get_filename() -> str:
+    return "saves/population" + str(len([name for name in os.listdir('saves')]))
+
+
 if __name__ == '__main__':
     pop = initialize_population()
+    save.export_population(get_filename(), pop)
+    new_gen = run_one_generation(pop)
+    print(new_gen)
+    save.export_population(get_filename(), new_gen)
 
-    crossed_pop = []
-    while len(crossed_pop) < POPULATION_SIZE:
-        random.shuffle(pop)
-        for i1, i2 in zip(pop[:2], pop[2::4]):
-            a, b = cross_individuals(i1, i2)
-            crossed_pop.append(a)
-            crossed_pop.append(b)
-    print(crossed_pop)
-
-    save.export_population("export", crossed_pop)
-    loaded_pop = save.load_population("export")
-    print(loaded_pop)
