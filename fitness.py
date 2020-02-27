@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-import sys
 import subprocess
-
 from collections import namedtuple
 from typing import List
-from genetic import Rule, create_individual
+
+from genetic import create_individual
 
 Rule = namedtuple("Rule", "arity param1 param2 param3 param4")
 
@@ -32,10 +31,11 @@ def write_rule(rule: Rule, name: str) -> str:
         res += '/%x[' + str(param3) + ',' + str(param4) + ']'
     return res
 
+
 def generate_template(individual: List[Rule], id: str) -> None:
-    with open(TEMPLATE_FILE+id, "w+") as f:
-        for i,rule in enumerate(individual):
-            f.write(write_rule(rule,str(i))+"\n")
+    with open(TEMPLATE_FILE + id, "w+") as f:
+        for i, rule in enumerate(individual):
+            f.write(write_rule(rule, str(i)) + "\n")
         f.write("# External Knowledge\n")
         # with open(EXTERNAL_KNOWLEDGE,'r') as f2:
         #     for line in f2:
