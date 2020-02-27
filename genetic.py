@@ -29,13 +29,13 @@ def mutate_rule(rule: Rule):
             arity = '*'
         if arity == '*':
             arity = 'U'
-    if mutation >= MUTATE_ARITY_CHANCE & mutation < MUTATE_PARAM_CHANCE:
-        param1 += random.randint(-1, 1)
-        param2 += random.randint(-1, 1)
-    if mutation >= MUTATE_ARITY_CHANCE + MUTATE_PARAM_CHANCE & mutation < MUTATE_DOUBLE_CHANCE:
-        param3 = param1
-        param4 = 0
-    return Rule(arity, param1, param2, param3, param4)
+    if mutation >= MUTATE_ARITY_CHANCE & mutation < MUTATE_ARITY_CHANCE+MUTATE_PARAM_CHANCE:
+            param1+=random.randint(-1,1)
+            param2+=random.randint(-1,1)
+    if mutation >= MUTATE_ARITY_CHANCE+MUTATE_PARAM_CHANCE & mutation <MUTATE_ARITY_CHANCE+MUTATE_PARAM_CHANCE+MUTATE_DOUBLE_CHANCE:
+            param3 = param1
+            param4 = 0
+    return Rule(arity,param1,param2,param3,param4)
 
 
 def add_random_rule(individual: List[Rule]):
@@ -58,7 +58,7 @@ def cross_individuals(i1: list, i2: list) -> Tuple[List, List]:
 
 
 def create_rule() -> Rule:
-    arity = 'U' if random.randint(0, 5) < 3 else 'B' if random.randint(0, 5) < 3 else '*'
+    arity = 'U' if random.randint(0, 5) < 4 else 'B' if random.randint(0,5) < 4 else '*'
     param1 = random.randint(-2, 2)
     param2 = 0
     return Rule(arity, param1, param2, None, None)
