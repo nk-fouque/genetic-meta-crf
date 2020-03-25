@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from keras import  backend as K
 
 import tensorflow as tf
+import tensorflow_addons as tfa
 configT = tf.ConfigProto()
 configT.gpu_options.allow_growth = True
 session = tf.Session(config=configT)
@@ -39,6 +40,8 @@ def f1_m(y_true, y_pred):
 
 if __name__ == '__main__':
     args = sys.argv
+    DATASET = args[1]
+    VARPARAM = int(args[2]) if len(args)>1 else 25
     dict_words = dict()
     dict_words['pad'] = 0
     dict_words['oov'] = 1
@@ -48,7 +51,7 @@ if __name__ == '__main__':
 
     longest_line = 86
 
-    with open(args[1], "r") as f:
+    with open(DATASET, "r") as f:
         corpus = []
         prediction = []
         corpus_current = []
@@ -118,7 +121,7 @@ if __name__ == '__main__':
                   loss='sparse_categorical_crossentropy',
                   metrics=[f1_m])
 
-    model.fit(X_train, y_train,batch_size=30,epochs=30)
+    model.fit(X_train, y_train,batch_size=30,epochs=VARPARAM)
 
     # score = model.evaluate(X_test, y_test)
 
@@ -139,7 +142,7 @@ if __name__ == '__main__':
     LABEL_FILE = 'generated_files/red_CuDDNN'
     EVAL_FILE = "generated_files/evalLSTM"
 
-    with open(EVAL_FILE,'w') as f:
+    with open(LABEL_FILE,'w+') as f:
         for line in predictions_list:
             for word in line:
                 if word[1]!='pad':
@@ -162,7 +165,7 @@ if __name__ == '__main__':
                 precision=l[3]
                 recall=l[5]
                 f1=l[7]
+                print(Evaluation(accuracy, precision, recall, f1))
                 break
-    print(Evaluation(accuracy, precision, recall, f1))
 
 
