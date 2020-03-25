@@ -5,17 +5,17 @@ from collections import namedtuple
 
 import numpy as np
 from keras import Input, Model
-from keras.layers import Bidirectional, Embedding, TimeDistributed, Dropout, CuDNNLSTM
-from keras.layers.core import Dense
-from keras.layers.recurrent import LSTM, GRU
+from keras import backend as K
+from keras.layers import Bidirectional, Embedding, TimeDistributed
+from keras.layers.core import Dense, Dropout
+from keras.layers.recurrent import GRU
 from sklearn.model_selection import train_test_split
-from keras import  backend as K
 
-import tensorflow as tf
-#import tensorflow_addons as tfa
-configT = tf.ConfigProto()
-configT.gpu_options.allow_growth = True
-session = tf.Session(config=configT)
+
+# import tensorflow_addons as tfa
+# configT = tf.ConfigProto()
+# configT.gpu_options.allow_growth = True
+# session = tf.Session(config=configT)
 
 
 def recall_m(y_true, y_pred):
@@ -67,7 +67,7 @@ if __name__ == '__main__':
             if (t[0] not in dict_words):
                 dict_words[t[0]] = len(dict_words)
             if (t[1] not in dict_labels):
-                dict_labels[t[1]] = len(dict_labels) 
+                dict_labels[t[1]] = len(dict_labels)
             corpus_current.append(t[0])
             prediction_current.append(t[1])
 
@@ -104,9 +104,9 @@ if __name__ == '__main__':
 
     entree = Input(shape=(longest_line,), dtype='float32')
     emb = Embedding(len(dict_words), 100)(entree)
-    bi = Bidirectional(CuDNNGRU(100, use_bias=True, return_sequences=True))(emb)
-    # drop = Dropout(0.5)(bi)
-    out = TimeDistributed(Dense(units=len(dict_labels), activation='tanh'))(bi)
+    bi = Bidirectional(GRU(150, use_bias=True, return_sequences=True))(emb)
+    drop = Dropout(0.2)(bi)
+    out = TimeDistributed(Dense(units=len(dict_labels), activation='tanh'))(drop)
 
     model = Model(inputs=entree, outputs=out)
 
@@ -116,12 +116,12 @@ if __name__ == '__main__':
     dict_words_revert = {v: k for k, v in dict_words.items()}
 
     # print(predictions_list)
-    
+
     model.compile(optimizer='rmsprop',
                   loss='sparse_categorical_crossentropy',
                   metrics=[f1_m])
 
-    model.fit(X_train, y_train,batch_size=30,epochs=VARPARAM)
+    model.fit(X_train, y_train, batch_size=300, epochs=VARPARAM)
 
     # score = model.evaluate(X_test, y_test)
 
@@ -129,28 +129,25 @@ if __name__ == '__main__':
 
     y_predict = model.predict(X_test)
 
-
-
-
-    predictions_list=[]
+    predictions_list = []
     for line, origin_labels in zip(y_predict, y_test):
         line_list = []
         for label_num, true_label in zip(line, origin_labels):
-            line_list.append((dict_labels_revert[np.argmax(label_num)],dict_labels_revert[true_label[0]]))
+            line_list.append((dict_labels_revert[np.argmax(label_num)], dict_labels_revert[true_label[0]]))
         predictions_list.append(line_list)
 
     LABEL_FILE = 'generated_files/red_CuDDNN'
     EVAL_FILE = "generated_files/evalLSTM"
 
-    with open(LABEL_FILE,'w+') as f:
+    with open(LABEL_FILE, 'w+') as f:
         for line in predictions_list:
             for word in line:
-                if word[1]!='pad':
-                    f.write('dummy\t'+word[0]+'\t'+word[1]+'\n')
+                if word[1] != 'pad':
+                    f.write('dummy\t' + word[0] + '\t' + word[1] + '\n')
             f.write('\n')
 
     try:
-        subprocess.check_call('cat '+LABEL_FILE+' | perl evaluation.pl > '+EVAL_FILE, shell = True)
+        subprocess.check_call('cat ' + LABEL_FILE + ' | perl evaluation.pl > ' + EVAL_FILE, shell=True)
     except subprocess.CalledProcessError as e:
         print(e.returncode)
         print(e.cmd)
@@ -159,13 +156,11 @@ if __name__ == '__main__':
     Evaluation = namedtuple("Evaluation", "accuracy precision recall f1")
     with open(EVAL_FILE, "r") as f:
         for i, line in enumerate(f):
-            if(i==1):
+            if (i == 1):
                 l = line.split()
-                accuracy=l[1]
-                precision=l[3]
-                recall=l[5]
-                f1=l[7]
+                accuracy = l[1]
+                precision = l[3]
+                recall = l[5]
+                f1 = l[7]
                 print(Evaluation(accuracy, precision, recall, f1))
                 break
-
-
