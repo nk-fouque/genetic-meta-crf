@@ -7,15 +7,15 @@ import numpy as np
 from keras import Input, Model
 from keras.layers import Bidirectional, Embedding, TimeDistributed, Dropout, CuDNNLSTM
 from keras.layers.core import Dense
-from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import LSTM, GRU
 from sklearn.model_selection import train_test_split
 from keras import  backend as K
 
 import tensorflow as tf
 import tensorflow_addons as tfa
-configT = tf.ConfigProto()
-configT.gpu_options.allow_growth = True
-session = tf.Session(config=configT)
+#configT = tf.ConfigProto()
+#configT.gpu_options.allow_growth = True
+#session = tf.Session(config=configT)
 
 
 def recall_m(y_true, y_pred):
@@ -41,7 +41,7 @@ def f1_m(y_true, y_pred):
 if __name__ == '__main__':
     args = sys.argv
     DATASET = args[1]
-    VARPARAM = int(args[2]) if len(args)>1 else 25
+    VARPARAM = int(args[2]) if len(args) > 2 else 25
     dict_words = dict()
     dict_words['pad'] = 0
     dict_words['oov'] = 1
@@ -102,13 +102,13 @@ if __name__ == '__main__':
     # print(X_train.shape)
     # print(y_train.shape)
 
-    entree = Input(shape=(longest_line,),dtype='float32')
+    entree = Input(shape=(longest_line,), dtype='float32')
     emb = Embedding(len(dict_words), 100)(entree)
-    bi = Bidirectional(CuDNNLSTM(20, return_sequences=True))(emb)
+    bi = Bidirectional(CuDNNGRU(100, use_bias=True, return_sequences=True))(emb)
     # drop = Dropout(0.5)(bi)
-    out = TimeDistributed(Dense(units=len(dict_labels),activation='tanh'))(bi)
+    out = TimeDistributed(Dense(units=len(dict_labels), activation='tanh'))(bi)
 
-    model = Model(inputs=entree,outputs=out)
+    model = Model(inputs=entree, outputs=out)
 
     # print(y_predict)
 
