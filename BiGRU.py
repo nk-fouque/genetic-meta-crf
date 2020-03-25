@@ -12,10 +12,10 @@ from sklearn.model_selection import train_test_split
 from keras import  backend as K
 
 import tensorflow as tf
-import tensorflow_addons as tfa
-#configT = tf.ConfigProto()
-#configT.gpu_options.allow_growth = True
-#session = tf.Session(config=configT)
+#import tensorflow_addons as tfa
+configT = tf.ConfigProto()
+configT.gpu_options.allow_growth = True
+session = tf.Session(config=configT)
 
 
 def recall_m(y_true, y_pred):
