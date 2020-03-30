@@ -5,37 +5,16 @@ from collections import namedtuple
 
 import numpy as np
 from keras import Input, Model
-from keras import backend as K
 from keras.layers import Bidirectional, Embedding, TimeDistributed
 from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import GRU
 from sklearn.model_selection import train_test_split
-
+import tensorflow as tf
 
 # import tensorflow_addons as tfa
 # configT = tf.ConfigProto()
 # configT.gpu_options.allow_growth = True
 # session = tf.Session(config=configT)
-
-
-def recall_m(y_true, y_pred):
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-    recall = true_positives / (possible_positives + K.epsilon())
-    return recall
-
-
-def precision_m(y_true, y_pred):
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-    precision = true_positives / (predicted_positives + K.epsilon())
-    return precision
-
-
-def f1_m(y_true, y_pred):
-    precision = precision_m(y_true, y_pred)
-    recall = recall_m(y_true, y_pred)
-    return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
 
 
 if __name__ == '__main__':
@@ -97,18 +76,19 @@ if __name__ == '__main__':
 
     X = np.asarray(matrix_words)
     Y = np.asarray(matrix_labels)
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
 
     # print(X_train.shape)
     # print(y_train.shape)
 
-    entree = Input(shape=(longest_line,), dtype='float32')
+    entree = Input(shape=(longest_line,), dtype='int32')
     emb = Embedding(len(dict_words), 100)(entree)
-    bi = Bidirectional(GRU(150, use_bias=True, return_sequences=True))(emb)
-    drop = Dropout(0.2)(bi)
-    out = TimeDistributed(Dense(units=len(dict_labels), activation='tanh'))(drop)
+    bi = Bidirectional(GRU(120, use_bias=True,return_sequences=True))(emb)
+    drop = Dropout(0.4)(bi)
+    out = TimeDistributed(Dense(units=len(dict_labels), activation='softmax'))(drop)
 
     model = Model(inputs=entree, outputs=out)
+    model.summary()
 
     # print(y_predict)
 
@@ -117,11 +97,11 @@ if __name__ == '__main__':
 
     # print(predictions_list)
 
-    model.compile(optimizer='rmsprop',
+    model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
-                  metrics=[f1_m])
+                  metrics=[tf.metrics.SparseCategoricalAccuracy()])
 
-    model.fit(X_train, y_train, batch_size=300, epochs=VARPARAM)
+    model.fit(X_train, y_train, batch_size=128, epochs=VARPARAM)
 
     # score = model.evaluate(X_test, y_test)
 
@@ -143,7 +123,7 @@ if __name__ == '__main__':
         for line in predictions_list:
             for word in line:
                 if word[1] != 'pad':
-                    f.write('dummy\t' + word[0] + '\t' + word[1] + '\n')
+                    f.write('dummy\t' + word[1] + '\t' + word[0] + '\n')
             f.write('\n')
 
     try:
