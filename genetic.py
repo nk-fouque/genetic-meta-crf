@@ -7,7 +7,7 @@ from typing import Tuple, List
 import fitness
 import save
 
-POPULATION_SIZE = 4
+POPULATION_SIZE = 50
 RANDOM_RULE_CHANCE = 10
 MUTATE_ARITY_CHANCE = 30
 MUTATE_PARAM_CHANCE = 50
@@ -54,7 +54,7 @@ def mutate(individual: List[Rule]) -> None:
 def cross_individuals(i1: list, i2: list) -> Tuple[List, List]:
     total = i1 + i2
     random.shuffle(total)
-    cut = random.randint(1, len(total))
+    cut = random.randint(1, len(total)-1)
     return total[:cut], total[cut:]
 
 
@@ -109,7 +109,7 @@ def get_last_pop() -> str:
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == 'init':
-            if sys.argv > 2:
+            if len(sys.argv) > 2:
                 POPULATION_SIZE = int(sys.argv[2])
             pop = initialize_population()
             save.export_population(get_filename(), pop)

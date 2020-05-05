@@ -43,7 +43,7 @@ def fitness_individual(individual: List[Rule], id: str) -> Evaluation:
     generate_template(individual, str(id))
     try:
         subprocess.check_call(
-            WAPITI_LOCATION + ' train -p ' + TEMPLATE_FILE + id + ' -t 8 ' + DATASET + ' ' + MODEL_FILE + id,
+            WAPITI_LOCATION + ' train -p ' + TEMPLATE_FILE + id + ' -t 16 ' + DATASET + ' ' + MODEL_FILE + id,
             shell=True)
     except subprocess.CalledProcessError as e:
         print(e.returncode)
