@@ -90,7 +90,8 @@ def cross_population(population: List[List[Rule]]) -> List[List[Rule]]:
 def run_one_generation(population: List[List[Rule]]) -> List[List[Rule]]:
     evaluation = fitness.fitness_population(population)  # Evaluate pop
     scored_population = list(zip(evaluation, population))
-    scored_population.sort(key=lambda x: x[0], reverse=True)
+    scored_population.sort(key=lambda x: getattr(x[0],'f1'), reverse=True)
+    print(scored_population)
     new_population = cross_population(  # Create new pop
         [scored_individual[1] for scored_individual in scored_population[::len(scored_population) // 2]])
     for individual in new_population:  # Mutate new pop
@@ -112,8 +113,9 @@ if __name__ == '__main__':
                 POPULATION_SIZE = int(sys.argv[2])
             pop = initialize_population()
             save.export_population(get_filename(), pop)
-    pop = save.load_population(get_last_pop())
-    print('loaded '+get_last_pop())
-    new_gen = run_one_generation(pop)
-    print(new_gen)
-    save.export_population(get_filename(), new_gen)
+    while True:
+        pop = save.load_population(get_last_pop())
+        print('loaded '+get_last_pop())
+        new_gen = run_one_generation(pop)
+        print(new_gen)
+        save.export_population(get_filename(), new_gen)
