@@ -89,7 +89,7 @@ def cross_population(population: List[List[Rule]]) -> List[List[Rule]]:
 
 def run_one_generation(population: List[List[Rule]]) -> List[List[Rule]]:
     evaluation = fitness.fitness_population(population)  # Evaluate pop
-    scored_population = list(zip(range(4), population))
+    scored_population = list(zip(evaluation, population))
     scored_population.sort(key=lambda x: x[0], reverse=True)
     new_population = cross_population(  # Create new pop
         [scored_individual[1] for scored_individual in scored_population[::len(scored_population) // 2]])
