@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 from collections import namedtuple
 from typing import Tuple, List
 
@@ -101,10 +102,18 @@ def run_one_generation(population: List[List[Rule]]) -> List[List[Rule]]:
 def get_filename() -> str:
     return "saves/population" + str(len([name for name in os.listdir('saves')]))
 
+def get_last_pop() -> str:
+    return "saves/population" + str(len([name for name in os.listdir('saves')])-1)
 
 if __name__ == '__main__':
-    pop = initialize_population()
-    save.export_population(get_filename(), pop)
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'init':
+            if sys.argv > 2:
+                POPULATION_SIZE = int(sys.argv[2])
+            pop = initialize_population()
+            save.export_population(get_filename(), pop)
+    pop = save.load_population(get_last_pop())
+    print('loaded '+get_last_pop())
     new_gen = run_one_generation(pop)
     print(new_gen)
     save.export_population(get_filename(), new_gen)
