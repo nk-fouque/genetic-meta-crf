@@ -20,7 +20,6 @@ import tensorflow as tf
 if __name__ == '__main__':
     args = sys.argv
     DATASET = args[1]
-    VARPARAM = int(args[2]) if len(args) > 2 else 25
     dict_words = dict()
     dict_words['pad'] = 0
     dict_words['oov'] = 1
@@ -101,7 +100,7 @@ if __name__ == '__main__':
                   loss='sparse_categorical_crossentropy',
                   metrics=[tf.metrics.SparseCategoricalAccuracy()])
 
-    model.fit(X_train, y_train, batch_size=128, epochs=VARPARAM)
+    model.fit(X_train, y_train, batch_size=128, epochs=60)
 
     # score = model.evaluate(X_test, y_test)
 
