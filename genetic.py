@@ -40,7 +40,7 @@ def mutate_rule(rule: Rule):
 
 
 def add_random_rule(individual: List[Rule]):
-    individual += (create_rule())
+    individual.append(create_rule())
     pass
 
 
