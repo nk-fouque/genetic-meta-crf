@@ -1,3 +1,0 @@
-cities with airports
-states
-day of week
